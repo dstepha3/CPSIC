@@ -239,7 +239,8 @@ void hsFaculty::updateRecord(schedule schedule, User faculty, Statistics& statSe
 void hsFaculty::viewRecord(const systemControl &sys)
 {
     User patient;
-	bool another = false;
+    bool another = false;
+    bool answer = false;
 
     cout << endl;
 
@@ -261,7 +262,7 @@ void hsFaculty::viewRecord(const systemControl &sys)
             
             if (!sys.verifyUser(patient))
             {
-                cout << "\nError: Patient not found.\n\n";
+                cout << "\nError: Patient not found.\n";
             }
             else
             {
@@ -275,19 +276,24 @@ void hsFaculty::viewRecord(const systemControl &sys)
                 if (!i_stream.is_open())
                 {
                     checked = false;
-                    cout << "\nError: Could not open file.\n\n";
+                    cout << "\nError: Could not open file.\n";
                 }
             }
-        
+            
+            cout << "\nWould you like to exit? ( 1 = YES  |  0 = NO )  ";
+            cin >> answer;
+                
+            if (answer) { return; }
+                
         } while (!checked);
     
         cout << endl << i_stream.rdbuf();
     
         i_stream.close();
         
-        cout << "\n\nWould you like to view another? ( 1 = YES  |  0 = NO )";
+        cout << "\n\nWould you like to view another? ( 1 = YES  |  0 = NO )  ";
         cin >> another;
-		cout << endl << endl;
+		cout << endl;
         
     } while (another);
 }
