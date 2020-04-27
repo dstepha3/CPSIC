@@ -30,19 +30,19 @@ using namespace std;
 int main()
 {
 	ofstream os;
-
+    schedule schedule;
 	systemControl sys;
 	Statistics stats;
 	coronaInfo c_info;
 	ksuSystemAccess ksuAccess(os);
 	User* mainUser; bool studentStatus;
-	vector<schedule> facultySchedule(2); //facultySchedule doesn't track individual schedules yet, its still in testing
 	bool log_out = false;
 	int prevCoronaCount = 0;
+    
 
 	do {
 		log_out = false;
-		sys.facultyAccess = false;
+        sys.facultyAccess = false;
 		pair<User*, bool> userInfo = sys.logOn();
 		mainUser = userInfo.first;
 
@@ -54,16 +54,13 @@ int main()
 		}
 		prevCoronaCount = c_info.getOhioCount();
 
-		sys.addStatisticSnapshot(stats);
-		sys.addCoronaSnapshot(c_info);
-
 		if (sys.facultyAccess == false) {
 			ksuPatient patientUser(*mainUser, userInfo.second);
 			unsigned int choice;
 
 			do {
 				do {
-					cout << "Welcome to the KSU-HS CPSIC. What would you like to do?\n";
+					cout << "\nWelcome to the KSU-HS CPSIC. What would you like to do?\n";
 					cout << "Enter 1 to make an appointment.\n";
 					cout << "Press 2 to view your appointments.\n";
 					cout << "Press 3 to reschedule an appointment.\n";
@@ -77,19 +74,7 @@ int main()
 				} while (choice > 6);
 
 				if (choice == 1) {
-					//register appointment
-					int facultyChoice;
-					cout << "See a practioner or counselor?\n";
-					cout << "Enter 1 for practitioner, or 2 for counselor: ";
-					//will need to have a choice between individual faculty members rather than just the two types
-					do {
-						cin >> facultyChoice;
-						if (facultyChoice != 1 && facultyChoice != 2) cout << "Invalid input. Try again.\n";
-					} while (facultyChoice != 1 && facultyChoice != 2);
-
-					if (facultyChoice == 1) patientUser.addToPractitionerBill(facultySchedule[0]);
-					else patientUser.addToCounselorBill(facultySchedule[1]);
-
+                    patientUser.registerAppointment(schedule);
 				}
 				else if (choice == 2) {
 					//view appointments
@@ -148,41 +133,40 @@ int main()
 			do {
 				
 				do {
-					cout << "Welcome to the KSU-HS CPSIC. What would you like to do?\n";
-					cout << "Enter 1 to view your schedule.\n"; // needs implemented
-					cout << "Press 2 to edit your schedule.\n"; // needs implemented
-					cout << "Press 3 to remove available times.\n"; // needs implemented
-					cout << "Enter 4 to view statistical information.\n";
-					cout << "Enter 5 to update a patient record.\n";
-					cout << "Enter 6 to view a patient record.\n";
-					cout << "Enter 7 to log out of the system.\n";
+                    
+					cout << "\nWelcome to the KSU-HS CPSIC. What would you like to do?\n";
+					cout << "Enter 1 to view your schedule.\n";
+					cout << "Press 2 to edit your schedule.\n"; 
+					cout << "Enter 3 to view statistical information.\n";
+					cout << "Enter 4 to update a patient record.\n";
+					cout << "Enter 5 to view a patient record.\n";
+					cout << "Enter 6 to log out of the system.\n";
 					cout << "Input: ";
 					cin >> choice;
 
-					if (choice > 7) cout << "Invalid input. Try again.\n";
-				} while (choice > 7);
+					if (choice > 6) cout << "Invalid input. Try again.\n";
+				} while (choice > 6);
 
 				if (choice == 1) {
-					// view schedule
+                    facultyUser.viewSchedule(schedule);
 				}
 				else if (choice == 2) {
-					// edit schedule
+                    facultyUser.editSchedule(schedule);
 				}
 				else if (choice == 3) {
-					// remove times
+                    cout << endl;
+					facultyUser.showStats(c_info, stats);
+                    sys.visualizeStats();
+                    cout << endl;
 				}
 				else if (choice == 4) {
-					facultyUser.showStats(c_info, stats);
-					sys.visualizeStats();
-				}
-				else if (choice == 5) {
-					//facultyUser.updateRecord();
+					facultyUser.updateRecord(stats, sys);
 					//update stats accordingly
 				}
-				else if (choice == 6) {
+				else if (choice == 5) {
 					facultyUser.viewRecord(sys);
 				}
-				else if (choice == 7) {
+				else if (choice == 6) {
 					int logOutChoice;
 					do {
 						cout << "Log out? Enter 1 to confirm, 2 to cancel: ";
